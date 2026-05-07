@@ -1,0 +1,17 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+EXTENSIONS_DIR="/config/extensions"
+EXTENSION_IDS="
+openai.chatgpt
+muhammad-sammy.csharp
+"
+
+for EXTENSION_ID in ${EXTENSION_IDS}; do
+    if s6-setuidgid abc code-server --list-extensions --extensions-dir "${EXTENSIONS_DIR}" | grep -Fxq "${EXTENSION_ID}"; then
+        echo "[custom-init] ${EXTENSION_ID} already installed"
+    else
+        echo "[custom-init] Installing ${EXTENSION_ID}"
+        s6-setuidgid abc code-server --install-extension "${EXTENSION_ID}" --extensions-dir "${EXTENSIONS_DIR}"
+    fi
+done

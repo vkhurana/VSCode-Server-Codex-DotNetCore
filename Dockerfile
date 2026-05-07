@@ -6,7 +6,7 @@
 # export DEBIAN_FRONTEND=noninteractive
 
 # Test image in shell:
-# docker run -it --rm --pull always --name Testing ptr727/vscode-server-dotnetcore:develop /bin/bash
+# docker run -it --rm --pull always --name Testing vkhurana/vscode-server-codex-dotnetcore:develop /bin/bash
 
 # Build Dockerfile
 # docker buildx build --platform linux/amd64,linux/arm64 --tag testing:latest .
@@ -30,8 +30,8 @@ FROM lscr.io/linuxserver/code-server:latest
 ARG LABEL_VERSION="70.80"
 LABEL name="VSCode-Server-DotNet" \
     version=${LABEL_VERSION} \
-    description="VSCode Server with .NET SDK Pre-Installed" \
-    maintainer="Pieter Viljoen <ptr727@users.noreply.github.com>"
+    description="VSCode Server with Codex and .NET SDK Pre-Installed" \
+    maintainer="Vivek Khurana <vkhurana@users.noreply.github.com>"
 
 # See: https://github.com/dotnet/dotnet-docker/blob/main/src/sdk/7.0/jammy/amd64/Dockerfile
 ENV DOTNET_RUNNING_IN_CONTAINER=true \
@@ -62,10 +62,23 @@ RUN apt-get update && apt-get upgrade -y \
         libssl3 \
         libstdc++6 \
         libunwind8 \
+        nodejs \
+        npm \
         wget  \
         zlib1g \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Install OpenAI Codex CLI
+# https://github.com/openai/codex
+RUN npm install -g @openai/codex \
+    && npm cache clean --force \
+    && codex --version
+
+# Install OpenAI Codex code-server extension on container startup
+# https://open-vsx.org/extension/openai/chatgpt
+COPY root/ /
+RUN chmod +x /custom-cont-init.d/10-install-extensions
 
 # Set .NET root to same path used for installation
 # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script#set-environment-variables

@@ -5,27 +5,27 @@ Docker image is based on [LinuxServer.io Code-Server](https://github.com/linuxse
 
 ## License
 
-![GitHub License](https://img.shields.io/github/license/ptr727/VSCode-Server-DotNetCore)  
+![GitHub License](https://img.shields.io/github/license/vkhurana/VSCode-Server-Codex-DotNetCore)  
 
 ## Build Status
 
-[Code and Pipeline is on GitHub](https://github.com/ptr727/VSCode-Server-DotNetCore):  
-![GitHub Last Commit](https://img.shields.io/github/last-commit/ptr727/VSCode-Server-DotNetCore?logo=github)  
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ptr727/VSCode-Server-DotNetCore/BuildPublishPipeline.yml?logo=github)
+[Code and Pipeline is on GitHub](https://github.com/vkhurana/VSCode-Server-Codex-DotNetCore):  
+![GitHub Last Commit](https://img.shields.io/github/last-commit/vkhurana/VSCode-Server-Codex-DotNetCore?logo=github)  
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/vkhurana/VSCode-Server-Codex-DotNetCore/BuildPublishPipeline.yml?logo=github)
 
 ## Container Images
 
-Docker container images are published on [Docker Hub](https://hub.docker.com/r/ptr727/vscode-server-dotnetcore).  
+Docker container images are published on [Docker Hub](https://hub.docker.com/r/vkhurana/VSCode-Server-Codex-DotNetCore).  
 Multi-Architecture images are created for `linux/amd64` and `linux/arm64` (`linux/arm/v7` is [not supported](https://www.linuxserver.io/blog/a-farewell-to-arm-hf) by LSIO).  
 Tags are `latest` for `main` branch and `develop` for `develop` branch.  
-E.g. `docker pull ptr727/vscode-server-dotnetcore:latest`  
-E.g. `docker pull ptr727/vscode-server-dotnetcore:develop`
+E.g. `docker pull vkhurana/VSCode-Server-Codex-DotNetCore:latest`  
+E.g. `docker pull vkhurana/VSCode-Server-Codex-DotNetCore:develop`
 
 Builds include the LTS and STS [supported versions](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core) of .NET SDK's.
 
 Images are automatically rebuilt every Monday morning, picking up the latest upstream updates.  
-![Docker Pulls](https://img.shields.io/docker/pulls/ptr727/vscode-server-dotnetcore?logo=docker)  
-![Docker Image Version](https://img.shields.io/docker/v/ptr727/vscode-server-dotnetcore/latest?logo=docker)
+![Docker Pulls](https://img.shields.io/docker/pulls/vkhurana/VSCode-Server-Codex-DotNetCore?logo=docker)  
+![Docker Image Version](https://img.shields.io/docker/v/vkhurana/VSCode-Server-Codex-DotNetCore/latest?logo=docker)
 
 ## Usage
 
