@@ -1,6 +1,7 @@
 #!/usr/bin/with-contenv bash
 set -e
 
+CODE_SERVER_BIN="${CODE_SERVER_BIN:-/app/code-server/bin/code-server}"
 EXTENSIONS_DIR="/config/extensions"
 EXTENSION_VSIX_DIR="/usr/local/share/code-server/extensions"
 EXTENSION_IDS="
@@ -11,12 +12,17 @@ EXTENSION_VSIXES="
 divanvisagie.nord-native-theme|${EXTENSION_VSIX_DIR}/divanvisagie.nord-native-theme.vsix
 "
 
+if [ ! -x "${CODE_SERVER_BIN}" ]; then
+    echo "[custom-init] code-server not found at ${CODE_SERVER_BIN}"
+    exit 127
+fi
+
 for EXTENSION_ID in ${EXTENSION_IDS}; do
-    if s6-setuidgid abc code-server --list-extensions --extensions-dir "${EXTENSIONS_DIR}" | grep -Fxq "${EXTENSION_ID}"; then
+    if s6-setuidgid abc "${CODE_SERVER_BIN}" --list-extensions --extensions-dir "${EXTENSIONS_DIR}" | grep -Fxq "${EXTENSION_ID}"; then
         echo "[custom-init] ${EXTENSION_ID} already installed"
     else
         echo "[custom-init] Installing ${EXTENSION_ID}"
-        s6-setuidgid abc code-server --install-extension "${EXTENSION_ID}" --extensions-dir "${EXTENSIONS_DIR}"
+        s6-setuidgid abc "${CODE_SERVER_BIN}" --install-extension "${EXTENSION_ID}" --extensions-dir "${EXTENSIONS_DIR}"
     fi
 done
 
@@ -24,10 +30,10 @@ for EXTENSION_VSIX in ${EXTENSION_VSIXES}; do
     EXTENSION_ID="${EXTENSION_VSIX%%|*}"
     EXTENSION_PATH="${EXTENSION_VSIX#*|}"
 
-    if s6-setuidgid abc code-server --list-extensions --extensions-dir "${EXTENSIONS_DIR}" | grep -Fxq "${EXTENSION_ID}"; then
+    if s6-setuidgid abc "${CODE_SERVER_BIN}" --list-extensions --extensions-dir "${EXTENSIONS_DIR}" | grep -Fxq "${EXTENSION_ID}"; then
         echo "[custom-init] ${EXTENSION_ID} already installed"
     else
         echo "[custom-init] Installing ${EXTENSION_ID}"
-        s6-setuidgid abc code-server --install-extension "${EXTENSION_PATH}" --extensions-dir "${EXTENSIONS_DIR}"
+        s6-setuidgid abc "${CODE_SERVER_BIN}" --install-extension "${EXTENSION_PATH}" --extensions-dir "${EXTENSIONS_DIR}"
     fi
 done
