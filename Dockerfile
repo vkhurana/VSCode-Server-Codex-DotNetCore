@@ -75,8 +75,12 @@ RUN npm install -g @openai/codex \
     && npm cache clean --force \
     && codex --version
 
-# Install OpenAI Codex code-server extension on container startup
+# Install code-server extensions on container startup
 # https://open-vsx.org/extension/openai/chatgpt
+# https://marketplace.visualstudio.com/items?itemName=divanvisagie.nord-native-theme
+RUN mkdir -p /usr/local/share/code-server/extensions \
+    && wget -O /usr/local/share/code-server/extensions/divanvisagie.nord-native-theme.vsix \
+        https://marketplace.visualstudio.com/_apis/public/gallery/publishers/divanvisagie/vsextensions/nord-native-theme/latest/vspackage
 COPY root/ /
 RUN chmod +x /custom-cont-init.d/10-install-extensions
 
