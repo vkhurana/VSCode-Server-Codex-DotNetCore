@@ -6,7 +6,7 @@ Docker image is based on [LinuxServer.io Code-Server](https://github.com/linuxse
 ## Codex
 The Codex plugin (and the C#) plugin is pre-installed. To enable it:
 - Add an `auth.json` in `/config/.codex/` folder
-- `code-server` must be server over `https`
+- `code-server` must be served over `https`
 
 ## License
 
