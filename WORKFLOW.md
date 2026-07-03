@@ -153,8 +153,8 @@ publish gate are the identical definition applied to the same tree.
 pushes multi-arch tags straight to Docker Hub (`latest` for main, `develop` for develop, plus `:SemVer2`). The
 GitHub release is a **version anchor**: it tags the built commit and attaches the in-tree `LICENSE` +
 `README.md` (no build artifact - the image ships to Docker Hub, not the release). The Docker Hub repository
-overview (the root [`README.md`](./README.md)) is pushed on a `main` Docker publish, since Docker Hub does not
-read the GitHub README.
+overview is published separately, main-only, from [`Docker/README.md`](./Docker/README.md) by
+`publish-docker-readme-task.yml`, since Docker Hub does not read the GitHub README.
 
 ### Resource lifecycle
 
@@ -164,11 +164,10 @@ target adds a transfer artifact, it MUST set `retention-days: 1` and never blank
 
 ### Self-sufficiency: automatic updates
 
-Every Dependabot pull request auto-merges once the required checks pass (the checks are the safety net),
-except a **semver-major NuGet** bump, which waits for human review - this repo has no NuGet ecosystem, so in
-practice every bump auto-merges; the guard is retained for convergence with the sibling repos. A merged bump
-does not itself publish - it ships in the next weekly publish. There is no codegen and no upstream-version
-tracker. A person steps in only for a breaking change (a red check) or to dispatch a release.
+Every Dependabot pull request auto-merges once the required checks pass - any ecosystem and any tier, semver-major
+included (this repo has only the `github-actions` ecosystem). The required checks are the safety net, not the
+version bump. A merged bump does not itself publish - it ships in the next weekly publish. There is no codegen and
+no upstream-version tracker. A person steps in only for a breaking change (a red check) or to dispatch a release.
 
 ### Flow diagrams
 
@@ -248,9 +247,7 @@ flowchart TD
     DEP(["Dependabot opens PR<br/>any ecosystem (github-actions here)"]):::trig --> MB
     subgraph MBT ["merge-bot-pull-request.yml (pull_request_target, App token)"]
         MB{"event / author"}:::gate
-        MB -- "opened/reopened<br/>dependabot[bot], in-repo branch" --> EV{"semver-major NuGet?"}:::gate
-        EV -- "yes" --> HOLD(["no auto-merge<br/>(human review)"]):::stop
-        EV -- "no" --> EN["enable auto-merge<br/>squash develop / merge main<br/>--delete-branch"]
+        MB -- "opened/reopened<br/>dependabot[bot], in-repo branch" --> EN["enable auto-merge<br/>squash develop / merge main<br/>--delete-branch"]
         MB -- "synchronize by maintainer<br/>on a dependabot branch" --> DIS["disable auto-merge<br/>(idempotent)"]
     end
     EN --> CK{"required checks pass?"}:::gate
@@ -345,7 +342,8 @@ Each is a **MUST**, stated as input -> output plus the failure it prevents.
   identical definition CI runs on the same tree. *Prevents publishing a tree that would fail the lint gate.*
 - **D4.7 Docker publishing authenticates with Docker Hub credentials.** Output: the Docker target logs in via
   `docker/login-action` with `DOCKER_HUB_USERNAME` + `DOCKER_HUB_ACCESS_TOKEN` and pushes with
-  `docker/build-push-action`; the Docker Hub overview is pushed with the same token. There is no NuGet/OIDC
+  `docker/build-push-action`. The Docker Hub repository overview is published separately, main-only, by
+  `publish-docker-readme-task.yml` from `Docker/README.md` using the same credentials. There is no NuGet/OIDC
   publishing in this repo. *Prevents a missing-credential publish failure.*
 - **D4.8 Branch-scoped Docker buildcache.** Output: the Docker build reads both branches' registry caches
   (`buildcache-main`, `buildcache-develop`) and writes only its own branch's cache, only when pushing, so a
@@ -384,10 +382,9 @@ Each is a **MUST**, stated as input -> output plus the failure it prevents.
   checking out its code. Enables auto-merge on `opened`/`reopened`; squash on `develop`, merge-commit on
   `main` by the PR's base ref; disables auto-merge when a maintainer pushes to a bot branch. Concurrency keyed
   on PR number.
-- **D8.2 Dependabot auto-merges on green, semver-major NuGet excepted.** Output: every Dependabot PR
-  auto-merges once the required checks pass, except a semver-major NuGet bump (human review). This repo has no
-  NuGet ecosystem (only `github-actions`), so every bump auto-merges in practice; the guard is retained for
-  convergence with the sibling repos. A failing check blocks the merge. A merged bump does **not** itself
+- **D8.2 Dependabot auto-merges on green, every tier.** Output: every Dependabot PR - any ecosystem,
+  semver-major included - auto-merges once the required checks pass, with no version-tier exception (this repo
+  has only the `github-actions` ecosystem). A failing check blocks the merge. A merged bump does **not** itself
   publish (dependencies are not shipped inputs); it ships in the next weekly publish.
 - **D8.3 No codegen / upstream-version automation.** This repo has neither; the merge-bot carries only
   `merge-dependabot` + `disable-auto-merge-on-maintainer-push`.
@@ -401,8 +398,8 @@ Each is a **MUST**, stated as input -> output plus the failure it prevents.
 - **D9.3** Bash `run:` blocks start `set -euo pipefail`; multi-line `if:` uses `>-`.
 - **D9.4** Line endings follow `.editorconfig`.
 - **D9.5 No decorative / dropped workflows.** No date-badge (`build-datebadge-*`), no tool-versions task, no
-  separate docker-readme task, no executable/`build-executable-task`, no `PUBLISH_ON_MERGE` variable, no
-  `dorny/paths-filter`. Their presence is a defect to remove.
+  executable/`build-executable-task`, no `PUBLISH_ON_MERGE` variable, no `dorny/paths-filter`. Their presence
+  is a defect to remove.
 - **D9.6** Style is enforced in CI by the `lint` job (D1.3), from the same config files the editor uses.
 
 ### D10 - Repository configuration
@@ -439,8 +436,8 @@ Read the workflow files plus `version.json` and assert the fact behind each appl
 - **D7:** the publisher group is ref-independent with `cancel-in-progress: false`; the merge-bot keys on PR
   number; CI uses the standard group; reusable jobs declare permissions.
 - **D8/D9:** the merge-bot runs on `pull_request_target` with the App token, keyed on PR number; Dependabot
-  auto-merge excepts semver-major NuGet only; no codegen/upstream-version, date-badge, tool-versions,
-  docker-readme task, executable task, `PUBLISH_ON_MERGE`, or `dorny/paths-filter`; actions SHA-pinned;
+  auto-merge has no semver-major exception; no codegen/upstream-version, date-badge, tool-versions, executable
+  task, `PUBLISH_ON_MERGE`, or `dorny/paths-filter`; actions SHA-pinned;
   names/shells/conditionals per section 2.
 
 ### 5B. End-to-end trace scenarios (deterministic from the YAML)
@@ -464,7 +461,7 @@ Read the workflow files plus `version.json` and assert the fact behind each appl
 - Open a trivial-change PR and confirm S1 (the image smoke-builds, nothing pushed, aggregator green).
 - After a `main` publish (schedule or dispatch) confirm a stable release (`isPrerelease == false`, tag plus
   `LICENSE` + `README.md`, no build asset) and a multi-arch `latest` + `:SemVer2`
-  (`docker buildx imagetools inspect` shows amd64 + arm64) and the Docker Hub overview matching the root README;
+  (`docker buildx imagetools inspect` shows amd64 + arm64) and the Docker Hub overview matching `Docker/README.md`;
   after a `develop` dispatch confirm a prerelease `X.Y.<height>-g<sha>` + `develop` image. A re-run adds no duplicate
   release. Absent publish rights, record indeterminate and rely on 5A/5B.
 
