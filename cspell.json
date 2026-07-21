@@ -6,7 +6,8 @@
     "dotnetcore",
     "linuxserver",
     "LSIO",
-    "ptr"
+    "ptr",
+    "vkhurana"
   ],
   "ignorePaths": [
     "**/bin/**",
