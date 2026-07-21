@@ -38,7 +38,7 @@ Auto-review on push is configured (via the branch ruleset's `copilot_code_review
 PR_NODE=$(gh pr view <N> --json id --jq '.id')
 BOT_ID=$(gh api graphql -f query='
 {
-  repository(owner: "ptr727", name: "VSCode-Server-DotNetCore") {
+  repository(owner: "vkhurana", name: "VSCode-Server-Codex-DotNetCore") {
     pullRequest(number: <N>) {
       reviews(first: 50) { nodes { author { __typename login ... on Bot { id } } } }
     }
@@ -79,7 +79,7 @@ gh pr view <N> --json reviews --jq \
 
 # 2. Issue comment - show the most recent Copilot comment for manual
 #    confirmation. This is the REST API, so the login carries the `[bot]` suffix.
-gh api repos/ptr727/VSCode-Server-DotNetCore/issues/<N>/comments --jq \
+gh api repos/vkhurana/VSCode-Server-Codex-DotNetCore/issues/<N>/comments --jq \
   '[.[] | select(.user.login=="copilot-pull-request-reviewer[bot]")] | last | {created_at, body: .body[:200]}'
 ```
 
@@ -103,7 +103,7 @@ List unresolved threads. Use `first: 100` with cursor-based pagination; if `hasN
 ```sh
 gh api graphql -f query='
 {
-  repository(owner: "ptr727", name: "VSCode-Server-DotNetCore") {
+  repository(owner: "vkhurana", name: "VSCode-Server-Codex-DotNetCore") {
     pullRequest(number: <N>) {
       reviewThreads(first: 100) {
         nodes {

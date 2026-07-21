@@ -12,7 +12,7 @@ assumes. Each guarantee names the **failure it prevents**, so the reason survive
 
 ## 0. The model at a glance
 
-VSCode-Server-DotNetCore ships **one target**: a **multi-arch Docker image** (Docker Hub) that layers the
+VSCode-Server-Codex-DotNetCore ships **one target**: a **multi-arch Docker image** (Docker Hub) that layers the
 .NET LTS+STS SDKs onto the LinuxServer.io code-server base. There is no compiled code in this repo - the
 Dockerfile is the only build input. Two workflows do the work:
 
