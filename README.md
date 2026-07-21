@@ -4,7 +4,9 @@ This is a Docker image of VSCode Server with the .NET LTS and STS SDKs pre-insta
 Docker image is based on [LinuxServer.io Code-Server](https://github.com/linuxserver/docker-code-server), which is based on [Coder.com Code-Server](https://github.com/cdr/code-server).\
 
 ## Codex
+
 The Codex plugin and the C# plugins are pre-installed. To enable Codex:
+
 - Add an `auth.json` in `/config/.codex/` folder
 - `code-server` must be served over `https`
 
